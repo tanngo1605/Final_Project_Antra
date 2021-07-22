@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ReportingSystemPDFApplication<PDFService>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.antra.evaluation.reporting_system.ReportingSystemPDFApplication",
+            "projectName": "PDFService",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MainClientApplication<ClientService>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.antra.report.client.MainClientApplication",
+            "projectName": "ClientService",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ReportingSystemExcelApplication<ExcelService>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.antra.evaluation.reporting_system.ReportingSystemExcelApplication",
+            "projectName": "ExcelService",
+            "args": ""
+        }
+    ]
+}
