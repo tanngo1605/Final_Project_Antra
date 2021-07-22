@@ -3,6 +3,7 @@ package com.antra.report.client.controller;
 import com.antra.report.client.pojo.FileType;
 import com.antra.report.client.pojo.reponse.ErrorResponse;
 import com.antra.report.client.pojo.reponse.GeneralResponse;
+import com.antra.report.client.pojo.request.DeleteReportRequest;
 import com.antra.report.client.pojo.request.ReportRequest;
 import com.antra.report.client.service.ReportService;
 import org.slf4j.Logger;
@@ -47,6 +48,13 @@ public class ReportController {
         log.info("Got Request to generate report - async: {}", request);
         request.setDescription(String.join(" - ", "Async", request.getDescription()));
         reportService.generateReportsAsync(request);
+        return ResponseEntity.ok(new GeneralResponse());
+    }
+
+    @DeleteMapping(value = "/report/async")
+    public ResponseEntity<GeneralResponse> deleteReportAsync(@RequestBody @Validated DeleteReportRequest req){
+        log.info("Got delete request with request idL " + req.getReqId());
+        //reportService.deleteAsync(req.getID)
         return ResponseEntity.ok(new GeneralResponse());
     }
 

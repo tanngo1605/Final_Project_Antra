@@ -12,6 +12,7 @@ import com.antra.report.client.pojo.reponse.ExcelResponse;
 import com.antra.report.client.pojo.reponse.PDFResponse;
 import com.antra.report.client.pojo.reponse.ReportVO;
 import com.antra.report.client.pojo.reponse.SqsResponse;
+import com.antra.report.client.pojo.request.DeleteReportRequest;
 import com.antra.report.client.pojo.request.ReportRequest;
 import com.antra.report.client.repository.ReportRequestRepo;
 import org.slf4j.Logger;
@@ -119,6 +120,9 @@ public class ReportServiceImpl implements ReportService {
         log.info("Send SNS the message: {}",request);
         return new ReportVO(entity);
     }
+
+    @Override
+    public void deleteReportAsync(DeleteReportRequest req){}
 
     @Override
 //    @Transactional // why this? email could fail

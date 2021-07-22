@@ -1,6 +1,7 @@
 package com.antra.report.client.service;
 
 import com.amazonaws.services.sns.AmazonSNS;
+import com.antra.report.client.pojo.request.DeleteReportRequest;
 import com.antra.report.client.pojo.request.ReportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,5 +28,13 @@ public class SNSServiceImpl implements SNSService {
     @Override
     public void sendReportNotification(ReportRequest request) {
         send(request);
+    }
+
+    @Override
+    public void sendDeleteReportNotification(DeleteReportRequest req) {
+        // TODO Auto-generated method stub
+        String deleteTopic = "deleteData_topic";
+        this.notificationMessagingTemplate.sendNotification(deleteTopic, req, null);
+
     }
 }
