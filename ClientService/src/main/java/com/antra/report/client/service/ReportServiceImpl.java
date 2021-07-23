@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,8 @@ public class ReportServiceImpl implements ReportService {
     private final AmazonS3 s3Client;
     private final EmailService emailService;
 
-    public ReportServiceImpl(ReportRequestRepo reportRequestRepo, SNSService snsService, AmazonS3 s3Client, EmailService emailService) {
+    public ReportServiceImpl(ReportRequestRepo reportRequestRepo, SNSService snsService, AmazonS3 s3Client,
+            EmailService emailService) {
         this.reportRequestRepo = reportRequestRepo;
         this.snsService = snsService;
         this.s3Client = s3Client;
@@ -49,7 +51,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private ReportRequestEntity persistToLocal(ReportRequest request) {
-        request.setReqId("Req-"+ UUID.randomUUID().toString());
+        request.setReqId("Req-" + UUID.randomUUID().toString());
 
         ReportRequestEntity entity = new ReportRequestEntity();
         entity.setReqId(request.getReqId());
@@ -76,14 +78,15 @@ public class ReportServiceImpl implements ReportService {
         sendDirectRequests(request);
         return new ReportVO(reportRequestRepo.findById(request.getReqId()).orElseThrow());
     }
-    //TODO:Change to parallel process using Threadpool? CompletableFuture?
+
+    // TODO:Change to parallel process using Threadpool? CompletableFuture?
     private void sendDirectRequests(ReportRequest request) {
         RestTemplate rs = new RestTemplate();
         ExcelResponse excelResponse = new ExcelResponse();
         PDFResponse pdfResponse = new PDFResponse();
         try {
             excelResponse = rs.postForEntity("http://localhost:8888/excel", request, ExcelResponse.class).getBody();
-        } catch(Exception e){
+        } catch (Exception e) {
             log.error("Excel Generation Error (Sync) : e", e);
             excelResponse.setReqId(request.getReqId());
             excelResponse.setFailed(true);
@@ -92,7 +95,7 @@ public class ReportServiceImpl implements ReportService {
         }
         try {
             pdfResponse = rs.postForEntity("http://localhost:9999/pdf", request, PDFResponse.class).getBody();
-        } catch(Exception e){
+        } catch (Exception e) {
             log.error("PDF Generation Error (Sync) : e", e);
             pdfResponse.setReqId(request.getReqId());
             pdfResponse.setFailed(true);
@@ -106,6 +109,7 @@ public class ReportServiceImpl implements ReportService {
         BeanUtils.copyProperties(excelResponse, response);
         updateAsyncExcelReport(response);
     }
+
     private void updateLocal(PDFResponse pdfResponse) {
         SqsResponse response = new SqsResponse();
         BeanUtils.copyProperties(pdfResponse, response);
@@ -117,22 +121,40 @@ public class ReportServiceImpl implements ReportService {
     public ReportVO generateReportsAsync(ReportRequest request) {
         ReportRequestEntity entity = persistToLocal(request);
         snsService.sendReportNotification(request);
-        log.info("Send SNS the message: {}",request);
+        log.info("Send SNS the message: {}", request);
         return new ReportVO(entity);
     }
 
     @Override
-    public void deleteReportAsync(DeleteReportRequest req){}
+    public void deleteReportAsync(DeleteReportRequest req) {
+        // Optional<ReportRequestEntity> result = reportRequestRepo.findById(req.getReqId());
+        // if (result.isEmpty()) {
+        //     throw new RequestNotFoundException();
+        // }
+
+        // ReportRequestEntity report = result.get();
+        // report.setUpdatedTime(LocalDateTime.now());
+        // var pdfReport = report.getPdfReport();
+        // pdfReport.setStatus(ReportStatus.DELETING);
+        // var excelReport = report.getExcelReport();
+        // excelReport.setStatus(ReportStatus.DELETING);
+        // reportRequestRepo.save(report);
+
+        //send delete request to SNS
+        snsService.sendDeleteReportNotification(req);
+
+    }
 
     @Override
-//    @Transactional // why this? email could fail
+    // @Transactional // why this? email could fail
     public void updateAsyncPDFReport(SqsResponse response) {
-        ReportRequestEntity entity = reportRequestRepo.findById(response.getReqId()).orElseThrow(RequestNotFoundException::new);
+        ReportRequestEntity entity = reportRequestRepo.findById(response.getReqId())
+                .orElseThrow(RequestNotFoundException::new);
         var pdfReport = entity.getPdfReport();
         pdfReport.setUpdatedTime(LocalDateTime.now());
         if (response.isFailed()) {
             pdfReport.setStatus(ReportStatus.FAILED);
-        } else{
+        } else {
             pdfReport.setStatus(ReportStatus.COMPLETED);
             pdfReport.setFileId(response.getFileId());
             pdfReport.setFileLocation(response.getFileLocation());
@@ -146,14 +168,15 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-//    @Transactional
+    // @Transactional
     public void updateAsyncExcelReport(SqsResponse response) {
-        ReportRequestEntity entity = reportRequestRepo.findById(response.getReqId()).orElseThrow(RequestNotFoundException::new);
+        ReportRequestEntity entity = reportRequestRepo.findById(response.getReqId())
+                .orElseThrow(RequestNotFoundException::new);
         var excelReport = entity.getExcelReport();
         excelReport.setUpdatedTime(LocalDateTime.now());
         if (response.isFailed()) {
             excelReport.setStatus(ReportStatus.FAILED);
-        } else{
+        } else {
             excelReport.setStatus(ReportStatus.COMPLETED);
             excelReport.setFileId(response.getFileId());
             excelReport.setFileLocation(response.getFileLocation());
@@ -181,20 +204,22 @@ public class ReportServiceImpl implements ReportService {
             return s3Client.getObject(bucket, key).getObjectContent();
         } else if (type == FileType.EXCEL) {
             String fileId = entity.getExcelReport().getFileId();
-//            String fileLocation = entity.getExcelReport().getFileLocation();
-//            try {
-//                return new FileInputStream(fileLocation);// this location is in local, definitely sucks
-//            } catch (FileNotFoundException e) {
-//                log.error("No file found", e);
-//            }
+            // String fileLocation = entity.getExcelReport().getFileLocation();
+            // try {
+            // return new FileInputStream(fileLocation);// this location is in local,
+            // definitely sucks
+            // } catch (FileNotFoundException e) {
+            // log.error("No file found", e);
+            // }
             RestTemplate restTemplate = new RestTemplate();
-//            InputStream is = restTemplate.execute(, HttpMethod.GET, null, ClientHttpResponse::getBody, fileId);
+            // InputStream is = restTemplate.execute(, HttpMethod.GET, null,
+            // ClientHttpResponse::getBody, fileId);
             ResponseEntity<Resource> exchange = restTemplate.exchange("http://localhost:8888/excel/{id}/content",
                     HttpMethod.GET, null, Resource.class, fileId);
             try {
                 return exchange.getBody().getInputStream();
             } catch (IOException e) {
-                log.error("Cannot download excel",e);
+                log.error("Cannot download excel", e);
             }
         }
         return null;

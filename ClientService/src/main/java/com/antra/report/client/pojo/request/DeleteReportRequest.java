@@ -5,14 +5,19 @@ import javax.validation.constraints.NotBlank;
 public class DeleteReportRequest {
     @NotBlank
     private String reqId;
+    private RequestMethods requestMethod = RequestMethods.DELETE;
+    // private String requestMethod = "DELETE";
 
     public String getReqId() {
         return reqId;
     }
 
-    public void setReqId(String reqId) {
-        this.reqId = reqId;
+    public RequestMethods getRequestMethod() {
+        return requestMethod;
     }
-    
-    
+
+    // public String getRequestMethod() {
+    //     return requestMethod;
+    // }
+
 }

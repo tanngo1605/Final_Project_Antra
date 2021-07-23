@@ -52,7 +52,7 @@ public class ExcelRequestQueueListener {
     @SqsListener(value = "Excel_Request_Queue")
     public void fanoutQueueListener(ExcelSNSRequest request) {
         log.info("Get fanout request: {}", request);
-        queueListener(request.getExcelRequest());
+        //queueListener(request.getExcelRequest());
     }
 
     private void send(Object message) {

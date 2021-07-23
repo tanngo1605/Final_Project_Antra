@@ -52,19 +52,20 @@ public class ReportController {
     }
 
     @DeleteMapping(value = "/report/async")
-    public ResponseEntity<GeneralResponse> deleteReportAsync(@RequestBody @Validated DeleteReportRequest req){
-        log.info("Got delete request with request idL " + req.getReqId());
-        //reportService.deleteAsync(req.getID)
+    public ResponseEntity<GeneralResponse> deleteReportAsync(@RequestBody @Validated DeleteReportRequest req) {
+        log.info("Got delete request with request id " + req.getReqId());
+        reportService.deleteReportAsync(req);
         return ResponseEntity.ok(new GeneralResponse());
     }
 
     @GetMapping("/report/content/{reqId}/{type}")
-    public void downloadFile(@PathVariable String reqId, @PathVariable FileType type, HttpServletResponse response) throws IOException {
+    public void downloadFile(@PathVariable String reqId, @PathVariable FileType type, HttpServletResponse response)
+            throws IOException {
         log.debug("Got Request to Download File - type: {}, reqid: {}", type, reqId);
         InputStream fis = reportService.getFileBodyByReqId(reqId, type);
         String fileType = null;
         String fileName = null;
-        if(type == FileType.PDF) {
+        if (type == FileType.PDF) {
             fileType = "application/pdf";
             fileName = "report.pdf";
         } else if (type == FileType.EXCEL) {
@@ -75,19 +76,20 @@ public class ReportController {
         response.setHeader("fileName", fileName);
         if (fis != null) {
             FileCopyUtils.copy(fis, response.getOutputStream());
-        } else{
+        } else {
             response.setStatus(500);
         }
         log.debug("Downloaded File:{}", reqId);
     }
 
-//   @DeleteMapping
-//   @PutMapping
+    // @DeleteMapping
+    // @PutMapping
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GeneralResponse> handleValidationException(MethodArgumentNotValidException e) {
         log.warn("Input Data invalid: {}", e.getMessage());
-        String errorFields = e.getBindingResult().getFieldErrors().stream().map(fe -> String.join(" ",fe.getField(),fe.getDefaultMessage())).collect(Collectors.joining(", "));
+        String errorFields = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> String.join(" ", fe.getField(), fe.getDefaultMessage())).collect(Collectors.joining(", "));
         return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST, errorFields), HttpStatus.BAD_REQUEST);
     }
 }

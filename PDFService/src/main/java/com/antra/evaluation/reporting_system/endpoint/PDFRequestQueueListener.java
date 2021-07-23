@@ -50,8 +50,8 @@ public class PDFRequestQueueListener {
 
     @SqsListener("PDF_Request_Queue")
     public void fanoutQueueListener(PDFSNSRequest request) {
-        log.info("Get fanout request: {}", request);
-        queueListener(request.getPdfRequest());
+        log.info("Get fanout request: {}", request.toString());
+        //queueListener(request.getPdfRequest());
     }
 
     private void send(Object message) {
