@@ -9,9 +9,18 @@ public class PDFRequest {
     private List<List<String>> data;
     private String submitter;
     private RequestMethods requestMethod;
+    private String pdfFileId;
 
     public String getReqId() {
         return reqId;
+    }
+
+    public String getPdfFileId() {
+        return pdfFileId;
+    }
+
+    public void setPdfFileId(String pdfFileId) {
+        this.pdfFileId = pdfFileId;
     }
 
     public RequestMethods getRequestMethod() {
@@ -56,7 +65,9 @@ public class PDFRequest {
 
     @Override
     public String toString() {
-        return "PDFRequest{" + "id=" + reqId + " method=" + requestMethod + " headers=" + headers + ", description='"
-                + description + '\'' + ", data=" + data + ", submitter='" + submitter + '\'' + '}';
+        return "PDFRequest [data=" + data + ", description=" + description + ", headers=" + headers + ", pdfFileId="
+                + pdfFileId + ", reqId=" + reqId + ", requestMethod=" + requestMethod + ", submitter=" + submitter
+                + "]";
     }
+
 }

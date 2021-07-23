@@ -5,4 +5,5 @@ import com.antra.evaluation.reporting_system.pojo.report.PDFFile;
 
 public interface PDFService {
     PDFFile createPDF(PDFRequest request);
+    void deletePDFFile(String fileId);
 }

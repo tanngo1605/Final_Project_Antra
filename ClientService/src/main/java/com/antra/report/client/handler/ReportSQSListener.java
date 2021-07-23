@@ -1,6 +1,7 @@
 package com.antra.report.client.handler;
 
 import com.antra.report.client.pojo.reponse.SqsResponse;
+import com.antra.report.client.pojo.request.RequestMethods;
 import com.antra.report.client.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +22,23 @@ public class ReportSQSListener {
     @SqsListener(value = "PDF_Response_Queue")
     public void responseQueueListenerPdf(SqsResponse response) {
         log.info("Get response from sqs : {}", response.toString());
+        if (response.getRequestMethod() == RequestMethods.DELETE) {
+            reportService.deleteReport(response.getReqId());
+            return;
+        }
 
-        // reportService.updateAsyncPDFReport(response);
+        reportService.updateAsyncPDFReport(response);
     }
 
     @SqsListener(value = "Excel_Response_Queue")
     public void responseQueueListenerExcel(SqsResponse response) {
         log.info("Get response from sqs : {}", response.toString());
+        if (response.getRequestMethod() == RequestMethods.DELETE) {
+            reportService.deleteReport(response.getReqId());
+            return;
+        }
 
-        // reportService.updateAsyncExcelReport(response);
+        reportService.updateAsyncExcelReport(response);
     }
 
     // @SqsListener(value = "Excel_Response_Queue", deletionPolicy =

@@ -6,6 +6,8 @@ import com.antra.report.client.pojo.reponse.SqsResponse;
 import com.antra.report.client.pojo.request.DeleteReportRequest;
 import com.antra.report.client.pojo.request.ReportRequest;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.InputStream;
 import java.util.List;
 
@@ -23,4 +25,7 @@ public interface ReportService {
     List<ReportVO> getReportList();
 
     InputStream getFileBodyByReqId(String reqId, FileType type);
+
+    @Transactional
+    void deleteReport(String reqId);
 }

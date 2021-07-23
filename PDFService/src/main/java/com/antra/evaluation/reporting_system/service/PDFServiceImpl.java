@@ -41,24 +41,33 @@ public class PDFServiceImpl implements PDFService {
         file.setDescription(request.getDescription());
         file.setGeneratedTime(LocalDateTime.now());
 
-        PDFFile generatedFile= generator.generate(request);
+        PDFFile generatedFile = generator.generate(request);
 
         File temp = new File(generatedFile.getFileLocation());
         log.debug("Upload temp file to s3 {}", generatedFile.getFileLocation());
-        s3Client.putObject(s3Bucket,file.getId(),temp);
+        s3Client.putObject(s3Bucket, file.getId(), temp);
         log.debug("Uploaded");
 
-        file.setFileLocation(String.join("/",s3Bucket,file.getId()));
+        file.setFileLocation(String.join("/", s3Bucket, file.getId()));
         file.setFileSize(generatedFile.getFileSize());
         file.setFileName(generatedFile.getFileName());
         repository.save(file);
 
         log.debug("clear tem file {}", file.getFileLocation());
-        if(temp.delete()){
+        if (temp.delete()) {
             log.debug("cleared");
         }
 
         return file;
+    }
+
+    @Override
+    public void deletePDFFile(String fileId) {
+        // TODO Auto-generated method stub
+        log.info("Bucket name: " + s3Bucket);
+        repository.deleteById(fileId);
+        //s3Client.deleteObject(s3Bucket, fileId);
+
     }
 
 }

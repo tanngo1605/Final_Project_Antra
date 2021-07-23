@@ -57,6 +57,7 @@ public class PDFRequestQueueListener {
         pdfResponse.setRequestMethod(RequestMethods.DELETE);
 
         // assume delete file on s3 here
+        pdfService.deletePDFFile(pdfRequest.getPdfFileId());
 
         send(pdfResponse);
 

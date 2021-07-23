@@ -140,7 +140,10 @@ public class ReportServiceImpl implements ReportService {
         excelReport.setStatus(ReportStatus.DELETING);
         reportRequestRepo.save(report);
 
-        //send delete topic to SNS
+        req.setExcelFileId(excelReport.getFileId());
+        req.setPdfFileId(pdfReport.getFileId());
+
+        // send delete topic to SNS
         snsService.sendDeleteReportNotification(req);
 
     }
@@ -223,5 +226,16 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         return null;
+    }
+
+    @Transactional
+    @Override
+    public void deleteReport(String reqId) {
+        // TODO Auto-generated method stub
+        if (reportRequestRepo.findById(reqId).isEmpty()) {
+            return;
+        }
+        reportRequestRepo.deleteById(reqId);
+
     }
 }
