@@ -3,6 +3,7 @@ package com.antra.evaluation.reporting_system.endpoint;
 import com.antra.evaluation.reporting_system.pojo.api.ExcelRequest;
 import com.antra.evaluation.reporting_system.pojo.api.ExcelResponse;
 import com.antra.evaluation.reporting_system.pojo.api.ExcelSNSRequest;
+import com.antra.evaluation.reporting_system.pojo.api.RequestMethods;
 import com.antra.evaluation.reporting_system.pojo.report.ExcelFile;
 import com.antra.evaluation.reporting_system.service.ExcelService;
 import org.slf4j.Logger;
@@ -25,12 +26,13 @@ public class ExcelRequestQueueListener {
         this.excelService = excelService;
     }
 
-   // @SqsListener("PDF_Request_Queue")
+    // @SqsListener("PDF_Request_Queue")
     public void queueListener(ExcelRequest request) {
-//        log.info("Get request: {}", request);
+        // log.info("Get request: {}", request);
         ExcelFile file = null;
         ExcelResponse response = new ExcelResponse();
         response.setReqId(request.getReqId());
+        response.setRequestMethod(RequestMethods.CREATE);
 
         try {
             file = excelService.generateFile(request, false);
@@ -48,11 +50,31 @@ public class ExcelRequestQueueListener {
         log.info("Replied back: {}", response);
     }
 
-    //@SqsListener("Excel_Request_Queue")
+    private void handleDelete(ExcelRequest excelRequest) {
+        log.info("Excel file delete");
+        ExcelResponse excelResponse = new ExcelResponse();
+        excelResponse.setReqId(excelRequest.getReqId());
+        excelResponse.setRequestMethod(RequestMethods.DELETE);
+
+        //assume delete file on s3 here
+
+        send(excelResponse);
+
+    }
+
+    // @SqsListener("Excel_Request_Queue")
     @SqsListener(value = "Excel_Request_Queue")
     public void fanoutQueueListener(ExcelSNSRequest request) {
-        log.info("Get fanout request: {}", request);
-        //queueListener(request.getExcelRequest());
+        log.info("Get fanout request: {}", request.toString());
+        ExcelRequest excelRequest = request.getExcelRequest();
+
+        if (excelRequest.getRequestMethod() == RequestMethods.DELETE) {
+            handleDelete(excelRequest);
+            return;
+        }
+
+        // create excel request
+        queueListener(request.getExcelRequest());
     }
 
     private void send(Object message) {
@@ -60,9 +82,6 @@ public class ExcelRequestQueueListener {
     }
 }
 /**
- * {
- *   "description":"Student Math Course Report",
- *   "headers":["Student #","Name","Class","Score"],
- *   "submitter":"Mrs. York1234"
- * }
+ * { "description":"Student Math Course Report", "headers":["Student
+ * #","Name","Class","Score"], "submitter":"Mrs. York1234" }
  **/

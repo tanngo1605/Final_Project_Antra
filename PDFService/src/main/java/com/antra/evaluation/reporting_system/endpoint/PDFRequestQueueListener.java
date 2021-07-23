@@ -3,6 +3,7 @@ package com.antra.evaluation.reporting_system.endpoint;
 import com.antra.evaluation.reporting_system.pojo.api.PDFRequest;
 import com.antra.evaluation.reporting_system.pojo.api.PDFResponse;
 import com.antra.evaluation.reporting_system.pojo.api.PDFSNSRequest;
+import com.antra.evaluation.reporting_system.pojo.api.RequestMethods;
 import com.antra.evaluation.reporting_system.pojo.report.PDFFile;
 import com.antra.evaluation.reporting_system.service.PDFService;
 import org.slf4j.Logger;
@@ -25,12 +26,13 @@ public class PDFRequestQueueListener {
         this.pdfService = pdfService;
     }
 
-   // @SqsListener("PDF_Request_Queue")
+    // @SqsListener("PDF_Request_Queue")
     public void queueListener(PDFRequest request) {
-//        log.info("Get request: {}", request);
+        // log.info("Get request: {}", request);
         PDFFile file = null;
         PDFResponse response = new PDFResponse();
         response.setReqId(request.getReqId());
+        response.setRequestMethod(RequestMethods.CREATE);
 
         try {
             file = pdfService.createPDF(request);
@@ -48,10 +50,29 @@ public class PDFRequestQueueListener {
         log.info("Replied back: {}", response);
     }
 
+    private void handleDelete(PDFRequest pdfRequest) {
+        log.info("Pdf file delete");
+        PDFResponse pdfResponse = new PDFResponse();
+        pdfResponse.setReqId(pdfRequest.getReqId());
+        pdfResponse.setRequestMethod(RequestMethods.DELETE);
+
+        // assume delete file on s3 here
+
+        send(pdfResponse);
+
+    }
+
     @SqsListener("PDF_Request_Queue")
     public void fanoutQueueListener(PDFSNSRequest request) {
         log.info("Get fanout request: {}", request.toString());
-        //queueListener(request.getPdfRequest());
+        PDFRequest pdfRequest = request.getPdfRequest();
+        if (pdfRequest.getRequestMethod() == RequestMethods.DELETE) {
+            handleDelete(pdfRequest);
+            return;
+        }
+
+        // Create pdf request
+        queueListener(request.getPdfRequest());
     }
 
     private void send(Object message) {
@@ -59,9 +80,6 @@ public class PDFRequestQueueListener {
     }
 }
 /**
- * {
- *   "description":"Student Math Course Report",
- *   "headers":["Student #","Name","Class","Score"],
- *   "submitter":"Mrs. York1234"
- * }
+ * { "description":"Student Math Course Report", "headers":["Student
+ * #","Name","Class","Score"], "submitter":"Mrs. York1234" }
  **/

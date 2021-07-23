@@ -13,9 +13,18 @@ public class ExcelResponse {
     private String description;
     private LocalDateTime generatedTime;
     private boolean failed;
+    private RequestMethods requestMethod;
 
     public String getReqId() {
         return reqId;
+    }
+
+    public RequestMethods getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(RequestMethods requestMethod) {
+        this.requestMethod = requestMethod;
     }
 
     public void setReqId(String reqId) {

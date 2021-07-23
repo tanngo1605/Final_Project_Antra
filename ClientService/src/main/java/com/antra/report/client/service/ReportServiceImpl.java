@@ -127,20 +127,20 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void deleteReportAsync(DeleteReportRequest req) {
-        // Optional<ReportRequestEntity> result = reportRequestRepo.findById(req.getReqId());
-        // if (result.isEmpty()) {
-        //     throw new RequestNotFoundException();
-        // }
+        Optional<ReportRequestEntity> result = reportRequestRepo.findById(req.getReqId());
+        if (result.isEmpty()) {
+            throw new RequestNotFoundException();
+        }
 
-        // ReportRequestEntity report = result.get();
-        // report.setUpdatedTime(LocalDateTime.now());
-        // var pdfReport = report.getPdfReport();
-        // pdfReport.setStatus(ReportStatus.DELETING);
-        // var excelReport = report.getExcelReport();
-        // excelReport.setStatus(ReportStatus.DELETING);
-        // reportRequestRepo.save(report);
+        ReportRequestEntity report = result.get();
+        report.setUpdatedTime(LocalDateTime.now());
+        var pdfReport = report.getPdfReport();
+        pdfReport.setStatus(ReportStatus.DELETING);
+        var excelReport = report.getExcelReport();
+        excelReport.setStatus(ReportStatus.DELETING);
+        reportRequestRepo.save(report);
 
-        //send delete request to SNS
+        //send delete topic to SNS
         snsService.sendDeleteReportNotification(req);
 
     }

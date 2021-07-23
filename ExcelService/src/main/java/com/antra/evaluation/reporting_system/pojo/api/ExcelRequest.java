@@ -10,9 +10,18 @@ public class ExcelRequest {
     private String description;
     private List<List<String>> data;
     private String submitter;
+    private RequestMethods requestMethod;
 
     public String getReqId() {
         return reqId;
+    }
+
+    public RequestMethods getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(RequestMethods requestMethod) {
+        this.requestMethod = requestMethod;
     }
 
     public void setReqId(String reqId) {
@@ -50,4 +59,11 @@ public class ExcelRequest {
     public void setData(List<List<String>> data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "ExcelRequest [data=" + data + ", description=" + description + ", headers=" + headers + ", reqId="
+                + reqId + ", requestMethod=" + requestMethod + ", submitter=" + submitter + "]";
+    }
+    
 }

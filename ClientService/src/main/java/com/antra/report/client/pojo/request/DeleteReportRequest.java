@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 public class DeleteReportRequest {
     @NotBlank
     private String reqId;
+
     private RequestMethods requestMethod = RequestMethods.DELETE;
     // private String requestMethod = "DELETE";
 

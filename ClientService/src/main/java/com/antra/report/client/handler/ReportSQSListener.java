@@ -20,24 +20,26 @@ public class ReportSQSListener {
 
     @SqsListener(value = "PDF_Response_Queue")
     public void responseQueueListenerPdf(SqsResponse response) {
-        log.info("Get response from sqs : {}", response);
-        //queueListener(request.getPdfRequest());
-        reportService.updateAsyncPDFReport(response);
+        log.info("Get response from sqs : {}", response.toString());
+
+        // reportService.updateAsyncPDFReport(response);
     }
 
     @SqsListener(value = "Excel_Response_Queue")
     public void responseQueueListenerExcel(SqsResponse response) {
-        log.info("Get response from sqs : {}", response);
-        //queueListener(request.getPdfRequest());
-        reportService.updateAsyncExcelReport(response);
+        log.info("Get response from sqs : {}", response.toString());
+
+        // reportService.updateAsyncExcelReport(response);
     }
 
-//    @SqsListener(value = "Excel_Response_Queue", deletionPolicy = SqsMessageDeletionPolicy.NEVER)
-//    public void responseQueueListenerExcelManualAcknowledge(SqsResponse response, Acknowledgment ack) {
-//        log.info("Get response from sqs : {}", response);
-//        log.info("Manually Acknowledge");
-//        //queueListener(request.getPdfRequest());
-//        reportService.updateAsyncExcelReport(response);
-//        ack.acknowledge();
-//    }
+    // @SqsListener(value = "Excel_Response_Queue", deletionPolicy =
+    // SqsMessageDeletionPolicy.NEVER)
+    // public void responseQueueListenerExcelManualAcknowledge(SqsResponse response,
+    // Acknowledgment ack) {
+    // log.info("Get response from sqs : {}", response);
+    // log.info("Manually Acknowledge");
+    // //queueListener(request.getPdfRequest());
+    // reportService.updateAsyncExcelReport(response);
+    // ack.acknowledge();
+    // }
 }

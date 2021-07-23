@@ -10,6 +10,7 @@ public class PDFResponse {
     private String fileLocation;
     private long fileSize;
     private boolean failed;
+    private RequestMethods requestMethod;
 
     public PDFResponse() {
     }
@@ -17,6 +18,14 @@ public class PDFResponse {
 //    public PDFResponse(String fileId) {
 //        this.fileId = fileId;
 //    }
+
+    public RequestMethods getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(RequestMethods requestMethod) {
+        this.requestMethod = requestMethod;
+    }
 
     public String getFileId() {
         return fileId;

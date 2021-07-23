@@ -1,14 +1,21 @@
 package com.antra.report.client.pojo.reponse;
 
+import com.antra.report.client.pojo.request.RequestMethods;
+
 public class SqsResponse {
     private String fileId;
     private String reqId;
     private String fileLocation;
     private long fileSize;
     private boolean failed;
+    private RequestMethods requestMethod;
 
     public String getFileId() {
         return fileId;
+    }
+
+    public RequestMethods getRequestMethod() {
+        return requestMethod;
     }
 
     public void setFileId(String fileId) {
@@ -49,13 +56,8 @@ public class SqsResponse {
 
     @Override
     public String toString() {
-        return "SqsResponse{" +
-                "fileId='" + fileId + '\'' +
-                ", reqId='" + reqId + '\'' +
-                ", fileLocation='" + fileLocation + '\'' +
-                ", fileSize=" + fileSize +
-                ", failed=" + failed +
-                '}';
+        return "SqsResponse [failed=" + failed + ", fileId=" + fileId + ", fileLocation=" + fileLocation + ", fileSize="
+                + fileSize + ", reqId=" + reqId + ", requestMethod=" + requestMethod + "]";
     }
-}
 
+}
