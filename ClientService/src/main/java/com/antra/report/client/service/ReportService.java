@@ -26,6 +26,5 @@ public interface ReportService {
 
     InputStream getFileBodyByReqId(String reqId, FileType type);
 
-    @Transactional
     void deleteReport(String reqId);
 }

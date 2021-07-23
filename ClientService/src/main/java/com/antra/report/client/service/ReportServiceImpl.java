@@ -228,7 +228,6 @@ public class ReportServiceImpl implements ReportService {
         return null;
     }
 
-    @Transactional
     @Override
     public void deleteReport(String reqId) {
         // TODO Auto-generated method stub

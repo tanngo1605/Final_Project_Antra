@@ -34,7 +34,7 @@ public class ReportSQSListener {
     public void responseQueueListenerExcel(SqsResponse response) {
         log.info("Get response from sqs : {}", response.toString());
         if (response.getRequestMethod() == RequestMethods.DELETE) {
-            reportService.deleteReport(response.getReqId());
+            // reportService.deleteReport(response.getReqId());
             return;
         }
 
